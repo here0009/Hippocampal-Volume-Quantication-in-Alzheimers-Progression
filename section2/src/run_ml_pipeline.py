@@ -9,14 +9,15 @@ from data_prep.HippocampusDatasetLoader import LoadHippocampusData
 
 random.seed(21)
 
+
 class Config:
     """
     Holds configuration parameters
     """
     def __init__(self):
         self.name = "Basic_unet"
-        self.root_dir =  os.path.abspath(os.path.join(*['..', '..', 'section1', 'out']))
-        self.n_epochs = 10
+        self.root_dir = os.path.abspath(os.path.join(*['..', '..', 'section1', 'out']))
+        self.n_epochs = 2
         self.learning_rate = 0.0002
         self.batch_size = 8
         self.patch_size = 64
@@ -54,18 +55,19 @@ if __name__ == "__main__":
     train_weights = [0.8, 0.1, 0.1]
     assert sum(train_weights) == 1
     train_len, val_len, _ = [int(_r * len(data)) for _r in train_weights]
-    indices = list(range(keys))
+    indices = list(keys)
     random.shuffle(indices)
     split['train'] = indices[:train_len]
     split['val'] = indices[train_len: train_len + val_len]
     split['test'] = indices[train_len + val_len:]
+    print(f'The length of train, validation and test dataset is {train_len}, {val_len}, {len(indices) - train_len - val_len}')
     # Set up and run experiment
     # TASK: Class UNetExperiment has missing pieces. Go to the file and fill them in
     exp = UNetExperiment(c, split, data)
 
     # You could free up memory by deleting the dataset
     # as it has been copied into loaders
-    del dataset 
+    del data
 
     # run training
     exp.run()

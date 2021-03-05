@@ -53,12 +53,20 @@ class UNetInferenceAgent:
         self.model.eval()
 
         # Assuming volume is a numpy array of shape [X,Y,Z] and we need to slice X axis
-        slices = []
+        x = volume.shape[0]
+        if volume.max() != 0:  # put volume in range of 0 ~ 1
+            volume = volume / volume.max()
+        mask = np.zeros(volume.shape)
 
         # TASK: Write code that will create mask for each slice across the X (0th) dimension. After 
         # that, put all slices into a 3D Numpy array. You can verify if your method is 
         # correct by running it on one of the volumes in your training set and comparing 
         # with the label in 3D Slicer.
         # <YOUR CODE HERE>
-
-        return # 
+        for i in range(x):
+            _slice = volume[i, :, :]
+            _slice_torch = torch.from_numpy(_slice).type(torch.float).unsqueeze(0).unsqueeze(0).to(self.device)
+            pred = self.model(_slice_torch)
+            pred = np.squeeze(pred.cpu().detach())
+            mask[i, :, :] = torch.argmax(pred, dim=0)
+        return mask

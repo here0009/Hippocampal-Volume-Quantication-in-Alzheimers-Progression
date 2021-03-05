@@ -94,9 +94,12 @@ def med_reshape(image, new_shape):
     """
 
     reshaped_image = np.zeros(new_shape)
-
     # TASK: write your original image into the reshaped image
     # <CODE GOES HERE>
-    reshaped_image[:,0,0] = image[:,0,0]
-
+    ix, iy, iz = image.shape
+    nx, ny, nz = new_shape
+    # the shape of new_shape should larger than the shape of image, choose the min value of image.shape and new_shape.shape in case of outliers
+    x, y, z = min(ix, nx), min(iy, ny), min(iz, nz)
+    for i in range(x):
+        reshaped_image[i, :y, :z] = image[i, :y, :z]
     return reshaped_image

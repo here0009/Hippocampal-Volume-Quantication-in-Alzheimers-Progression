@@ -92,14 +92,15 @@ class UNetExperiment:
         # Loop over our minibatches
         for i, batch in enumerate(self.train_loader):
             self.optimizer.zero_grad()
-
+            # print(i, batch, batch['image'].shape)
             # TASK: You have your data in batch variable. Put the slices as 4D Torch Tensors of 
             # shape [BATCH_SIZE, 1, PATCH_SIZE, PATCH_SIZE] into variables data and target. 
             # Feed data to the model and feed target to the loss function
             # 
             # data = <YOUR CODE HERE>
             # target = <YOUR CODE HERE>
-
+            data = batch['image'].to(self.device)
+            target = batch['seg'].to(self.device)
             prediction = self.model(data)
 
             # We are also getting softmax'd version of prediction to output a probability map
@@ -110,6 +111,7 @@ class UNetExperiment:
 
             # TASK: What does each dimension of variable prediction represent?
             # ANSWER:
+            # batch_size, 1, patch_size, patch_size ?
 
             loss.backward()
             self.optimizer.step()
@@ -151,9 +153,14 @@ class UNetExperiment:
 
         with torch.no_grad():
             for i, batch in enumerate(self.val_loader):
-                
                 # TASK: Write validation code that will compute loss on a validation sample
                 # <YOUR CODE HERE>
+                data = batch['image'].to(self.device)
+                target = batch['seg'].to(self.device)
+                prediction = self.model(data)
+
+                prediction_softmax = F.softmax(prediction, dim=1)
+                loss = self.loss_function(prediction, target[:, 0, :, :])
 
                 print(f"Batch {i}. Data shape {data.shape} Loss {loss}")
 
@@ -167,7 +174,7 @@ class UNetExperiment:
             np.mean(loss_list),
             data,
             target,
-            prediction_softmax, 
+            prediction_softmax,
             prediction,
             (self.epoch+1) * 100)
         print(f"Validation complete")
@@ -249,7 +256,7 @@ class UNetExperiment:
                 "dice": dc,
                 "jaccard": jc
                 })
-            print(f"{x['filename']} Dice {dc:.4f}. {100*(i+1)/len(self.test_data):.2f}% complete")
+            print(f"{x['filename']}: Dice {dc:.4f}, Jaccard {jc: .4f}. {100*(i+1)/len(self.test_data):.2f}% complete")
 
         out_dict["overall"] = {
             "mean_dice": np.mean(dc_list),

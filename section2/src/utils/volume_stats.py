@@ -3,6 +3,12 @@ Contains various functions for computing statistics over 3D volumes
 """
 import numpy as np
 
+def cross_sum(a, b):
+    """
+    return the cross sum between a and b
+    """
+    return ((a * b) > 0).sum()
+
 def Dice3d(a, b):
     """
     This will compute the Dice Similarity coefficient for two 3-dimensional volumes
@@ -25,7 +31,11 @@ def Dice3d(a, b):
     # TASK: Write implementation of Dice3D. If you completed exercises in the lessons
     # you should already have it.
     # <YOUR CODE HERE>
-    pass
+    if a.sum() == 0 and b.sum() == 0:
+        return 1
+    cross = cross_sum(a, b)
+    return 2 * cross / ((a > 0).sum() + (b > 0).sum())
+
 
 def Jaccard3d(a, b):
     """
@@ -46,8 +56,10 @@ def Jaccard3d(a, b):
     if a.shape != b.shape:
         raise Exception(f"Expecting inputs of the same shape, got {a.shape} and {b.shape}")
 
-    # TASK: Write implementation of Jaccard similarity coefficient. Please do not use 
+    # TASK: Write implementation of Jaccard similarity coefficient. Please do not use
     # the Dice3D function from above to do the computation ;)
     # <YOUR CODE GOES HERE>
-
-    return #
+    if a.sum() == 0 and b.sum() == 0:
+        return 1
+    cross = cross_sum(a, b)
+    return cross / ((a > 0).sum() + (b > 0).sum() - cross)

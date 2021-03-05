@@ -36,7 +36,9 @@ class SlicesDataset(Dataset):
         # You could implement caching strategy here if dataset is too large to fit
         # in memory entirely
         # Also this would be the place to call transforms if data augmentation is used
-        
+
+        # use torchvision.transforms to transform the data
+
         # TASK: Create two new keys in the "sample" dictionary, named "image" and "seg"
         # The values are 3D Torch Tensors with image and label data respectively. 
         # First dimension is size 1, and last two hold the voxel data from the respective
@@ -48,7 +50,10 @@ class SlicesDataset(Dataset):
         # Hint2: You can use None notation like so: arr[None, :] to add size-1 
         # dimension to a Numpy array
         # <YOUR CODE GOES HERE>
-
+        sample_image = self.data[slc[0]]['image'][slc[1]]
+        sample_lable = self.data[slc[0]]['seg'][slc[1]]
+        sample['image'] = torch.from_numpy(sample_image).type(torch.float).unsqueeze(0)  # or torch.cuda.FloatTensor for gpu?
+        sample['seg'] = torch.from_numpy(sample_lable).type(torch.long).unsqueeze(0)  # or torch.cuda.IntTensor for gpu?
         return sample
 
     def __len__(self):

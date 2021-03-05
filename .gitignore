@@ -2,3 +2,5 @@ section1
 data
 readme.img
 *.pyc
+section2/out
+section2/src/runs
