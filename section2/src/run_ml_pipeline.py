@@ -17,7 +17,7 @@ class Config:
     def __init__(self):
         self.name = "Basic_unet"
         self.root_dir = os.path.abspath(os.path.join(*['..', '..', 'section1', 'out']))
-        self.n_epochs = 2
+        self.n_epochs = 1
         self.learning_rate = 0.0002
         self.batch_size = 8
         self.patch_size = 64
@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # multi-fold training to improve your model quality
 
     keys = range(len(data))
-    print(keys)
+    print(f'There are {len(data)} files in the data')
     # Here, random permutation of keys array would be useful in case if we do something like 
     # a k-fold training and combining the results. 
 

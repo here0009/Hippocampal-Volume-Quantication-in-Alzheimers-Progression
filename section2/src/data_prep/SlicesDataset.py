@@ -4,6 +4,10 @@ Module for Pytorch dataset representations
 
 import torch
 from torch.utils.data import Dataset
+from torchvision.transforms import transforms
+import random
+import numpy as np
+random.seed(21)
 
 class SlicesDataset(Dataset):
     """
@@ -12,12 +16,25 @@ class SlicesDataset(Dataset):
     """
     def __init__(self, data):
         self.data = data
-
+        self.hflip = 0.3
+        self.vflip = 0.3
+        # self.roatation = 15
         self.slices = []
 
         for i, d in enumerate(data):
             for j in range(d["image"].shape[0]):
                 self.slices.append((i, j))
+
+    def img_transform(self, hflip, vflip):
+        """
+        return a composed image transformer function
+        """
+        operations = []
+        if hflip < self.hflip:
+            operations.append(transforms.RandomHorizontalFlip(p=1))
+        if vflip < self.vflip:
+            operations.append(transforms.RandomVerticalFlip(p=1))
+        return transforms.Compose([operations])
 
     def __getitem__(self, idx):
         """
@@ -36,9 +53,6 @@ class SlicesDataset(Dataset):
         # You could implement caching strategy here if dataset is too large to fit
         # in memory entirely
         # Also this would be the place to call transforms if data augmentation is used
-
-        # use torchvision.transforms to transform the data
-
         # TASK: Create two new keys in the "sample" dictionary, named "image" and "seg"
         # The values are 3D Torch Tensors with image and label data respectively. 
         # First dimension is size 1, and last two hold the voxel data from the respective
@@ -50,10 +64,18 @@ class SlicesDataset(Dataset):
         # Hint2: You can use None notation like so: arr[None, :] to add size-1 
         # dimension to a Numpy array
         # <YOUR CODE GOES HERE>
-        sample_image = self.data[slc[0]]['image'][slc[1]]
-        sample_lable = self.data[slc[0]]['seg'][slc[1]]
-        sample['image'] = torch.from_numpy(sample_image).type(torch.float).unsqueeze(0)  # or torch.cuda.FloatTensor for gpu?
-        sample['seg'] = torch.from_numpy(sample_lable).type(torch.long).unsqueeze(0)  # or torch.cuda.IntTensor for gpu?
+
+        # trans_fun = self.img_transform(random.random(), random.random(), random.randint(-self.roatation, self.roatation))
+        trans_fun = transforms.Compose([transforms.ToPILImage(), transforms.RandomHorizontalFlip(p=1), transforms.RandomVerticalFlip(p=1), transforms.ToTensor()])
+        sample_image = trans_fun(self.data[slc[0]]['image'][slc[1]].astype(np.float32))
+        sample_lable = trans_fun(self.data[slc[0]]['seg'][slc[1]].astype(np.long))
+        sample['image'] = sample_image
+        sample['seg'] = sample_lable
+        # trans_fun = self.img_transform(random.random(), random.random())
+        # sample_image = self.data[slc[0]]['image'][slc[1]]
+        # sample_lable = self.data[slc[0]]['seg'][slc[1]]
+        # sample['image'] = torch.from_numpy(sample_image).type(torch.float).unsqueeze(0)  # or torch.cuda.FloatTensor for gpu?
+        # sample['seg'] = torch.from_numpy(sample_lable).type(torch.long).unsqueeze(0)  # or torch.cuda.IntTensor for gpu?
         return sample
 
     def __len__(self):

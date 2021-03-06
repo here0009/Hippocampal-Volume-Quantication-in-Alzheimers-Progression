@@ -98,7 +98,8 @@ def med_reshape(image, new_shape):
     # <CODE GOES HERE>
     ix, iy, iz = image.shape
     nx, ny, nz = new_shape
-    # the shape of new_shape should larger than the shape of image, choose the min value of image.shape and new_shape.shape in case of outliers
+    assert ix == nx
+    # new_shape should larger than the shape of image, choose the min value of image.shape and new_shape.shape in 3 dimension case of outliers
     x, y, z = min(ix, nx), min(iy, ny), min(iz, nz)
     for i in range(x):
         reshaped_image[i, :y, :z] = image[i, :y, :z]

@@ -55,7 +55,7 @@ class UNetInferenceAgent:
         # Assuming volume is a numpy array of shape [X,Y,Z] and we need to slice X axis
         x = volume.shape[0]
         if volume.max() != 0:  # put volume in range of 0 ~ 1
-            volume = volume / volume.max()
+            volume = (volume - volume.min()) / (volume.max() - volume.min())
         mask = np.zeros(volume.shape)
 
         # TASK: Write code that will create mask for each slice across the X (0th) dimension. After 
