@@ -40,7 +40,8 @@ def LoadHippocampusData(root_dir, y_shape, z_shape):
 
         # TASK: normalize all images (but not labels) so that values are in [0..1] range
         # <YOUR CODE GOES HERE>
-        image = (image - image.min()) / (image.max() - image.min())
+        if image.max() != image.min():
+            image = (image - image.min()) / (image.max() - image.min())
 
         # We need to reshape data since CNN tensors that represent minibatches
         # in our case will be stacks of slices and stacks need to be of the same size.
@@ -55,7 +56,7 @@ def LoadHippocampusData(root_dir, y_shape, z_shape):
 
         # TASK: Why do we need to cast label to int?
         # ANSWER:
-        # med_reshape use np.zeros to generate a nump array of float, we need to convert it back to int
+        # med_reshape use np.zeros to generate a nump array of float, we need to feed label to loss function, which takes int as input
 
         out.append({"image": image, "seg": label, "filename": f})
 

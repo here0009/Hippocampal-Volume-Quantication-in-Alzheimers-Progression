@@ -17,8 +17,8 @@ class Config:
     def __init__(self):
         self.name = "Basic_unet"
         self.root_dir = os.path.abspath(os.path.join(*['..', '..', 'section1', 'out']))
-        self.n_epochs = 1
-        self.learning_rate = 0.0002
+        self.n_epochs = 10
+        self.learning_rate = 5E-5
         self.batch_size = 8
         self.patch_size = 64
         self.test_results_dir = os.path.abspath(os.path.join(*['..', 'out']))

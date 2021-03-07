@@ -37,7 +37,6 @@ class UNetInferenceAgent:
         Returns:
             3D NumPy array with prediction mask
         """
-        
         raise NotImplementedError
 
     def single_volume_inference(self, volume):
@@ -53,18 +52,17 @@ class UNetInferenceAgent:
         self.model.eval()
 
         # Assuming volume is a numpy array of shape [X,Y,Z] and we need to slice X axis
-        x = volume.shape[0]
-        if volume.max() != 0:  # put volume in range of 0 ~ 1
-            volume = (volume - volume.min()) / (volume.max() - volume.min())
-        mask = np.zeros(volume.shape)
-
-        # TASK: Write code that will create mask for each slice across the X (0th) dimension. After 
-        # that, put all slices into a 3D Numpy array. You can verify if your method is 
-        # correct by running it on one of the volumes in your training set and comparing 
+        # TASK: Write code that will create mask for each slice across the X (0th) dimension. After
+        # that, put all slices into a 3D Numpy array. You can verify if your method is
+        # correct by running it on one of the volumes in your training set and comparing
         # with the label in 3D Slicer.
         # <YOUR CODE HERE>
+        x = volume.shape[0]
+        mask = np.zeros(volume.shape)
         for i in range(x):
             _slice = volume[i, :, :]
+            if _slice.min() != _slice.max():
+                _slice = (_slice - _slice.min()) / (_slice.max() - _slice.min())  # change the range of _slice to [0, 1]
             _slice_torch = torch.from_numpy(_slice).type(torch.float).unsqueeze(0).unsqueeze(0).to(self.device)
             pred = self.model(_slice_torch)
             pred = np.squeeze(pred.cpu().detach())
