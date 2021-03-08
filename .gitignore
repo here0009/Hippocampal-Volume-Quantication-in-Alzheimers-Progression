@@ -4,3 +4,6 @@ readme.img
 *.pyc
 section2/out
 section2/src/runs
+*.ipynb
+*.dcm
+section3/src/model/

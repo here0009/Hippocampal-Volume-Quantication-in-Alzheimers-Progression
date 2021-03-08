@@ -19,7 +19,7 @@ import subprocess
 
 import numpy as np
 import pydicom
-
+from utils.utils import med_reshape
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw
@@ -62,7 +62,9 @@ def get_predicted_volumes(pred):
 
     # TASK: Compute the volume of your hippocampal prediction
     # <YOUR CODE HERE>
-
+    volume_ant = np.sum(pred == 2)
+    volume_post = np.sum(pred == 1)
+    total_volume = volume_ant + volume_post
     return {"anterior": volume_ant, "posterior": volume_post, "total": total_volume}
 
 def create_report(inference, header, orig_vol, pred_vol):
@@ -77,21 +79,17 @@ def create_report(inference, header, orig_vol, pred_vol):
     Returns:
         PIL image
     """
-
     # The code below uses PIL image library to compose an RGB image that will go into the report
     # A standard way of storing measurement data in DICOM archives is creating such report and
     # sending them on as Secondary Capture IODs (http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_A.8.html)
-    # Essentially, our report is just a standard RGB image, with some metadata, packed into 
-    # DICOM format. 
+    # Essentially, our report is just a standard RGB image, with some metadata, packed into
+    # DICOM format.
 
     pimg = Image.new("RGB", (1000, 1000))
     draw = ImageDraw.Draw(pimg)
 
     header_font = ImageFont.truetype("assets/Roboto-Regular.ttf", size=40)
     main_font = ImageFont.truetype("assets/Roboto-Regular.ttf", size=20)
-
-    slice_nums = [orig_vol.shape[2]//3, orig_vol.shape[2]//2, orig_vol.shape[2]*3//4] # is there a better choice?
-
     # TASK: Create the report here and show information that you think would be relevant to
     # clinicians. A sample code is provided below, but feel free to use your creative 
     # genius to make if shine. After all, the is the only part of all our machine learning 
@@ -99,11 +97,14 @@ def create_report(inference, header, orig_vol, pred_vol):
     # depend on how you present them.
 
     # SAMPLE CODE BELOW: UNCOMMENT AND CUSTOMIZE
-    # draw.text((10, 0), "HippoVolume.AI", (255, 255, 255), font=header_font)
-    # draw.multiline_text((10, 90),
-    #                     f"Patient ID: {header.PatientID}\n"
-    #                       <WHAT OTHER INFORMATION WOULD BE RELEVANT?>
-    #                     (255, 255, 255), font=main_font)
+    draw.text((10, 0), "HippoVolume.AI", (255, 255, 255), font=header_font)
+    #<WHAT OTHER INFORMATION WOULD BE RELEVANT?>
+    draw.multiline_text((10, 90),
+                        f"Patient ID:    {header.PatientID}\nPatient Name:    {header.PatientName}\nModality:    {header.Modality}\nSeries Description:    {header.SeriesDescription}",(255, 255, 255), font=main_font)
+    slice_nums = [orig_vol.shape[2] // 4, orig_vol.shape[2] // 2, orig_vol.shape[2] * 3 // 4]  # is there a better choice? 
+    # choose 1/4, 2/4, 3.4 for visulization
+    draw.multiline_text((500, 90),
+                    f"Anterior Volume:    {inference['anterior']}\nPosterior Volume:    {inference['posterior']}\nTotal Volume:    {inference['total']}\nSlices:    {slice_nums[0]}, {slice_nums[1]}, {slice_nums[2]}",(255, 255, 255), font=main_font)
 
     # STAND-OUT SUGGESTION:
     # In addition to text data in the snippet above, can you show some images?
@@ -112,13 +113,32 @@ def create_report(inference, header, orig_vol, pred_vol):
     #
     # Create a PIL image from array:
     # Numpy array needs to flipped, transposed and normalized to a matrix of values in the range of [0..255]
-    # nd_img = np.flip((slice/np.max(slice))*0xff).T.astype(np.uint8)
     # This is how you create a PIL image from numpy array
-    # pil_i = Image.fromarray(nd_img, mode="L").convert("RGBA").resize(<dimensions>)
     # Paste the PIL image into our main report image object (pimg)
-    # pimg.paste(pil_i, box=(10, 280))
+    # orig_vol = med_reshape(orig_vol, (orig_vol.shape[0], PATCH_SIZE, PATCH_SIZE))
 
+    resize_factor = 5
+    x, y, z = orig_vol.shape
+    pred_vol = pred_vol[:x, :y, :z]  # resize pred_vol to the original size
+    rows = [300, 500, 700]
+    cols = [50, 350, 650]
+
+    for i, v in enumerate(slice_nums):
+        _image = orig_vol[:, :, slice_nums[i]]
+        _label = pred_vol[:, :, slice_nums[i]]
+        nd_img = np.flip((_image / np.max(_image)) * 0xff).T.astype(np.uint8)
+        nd_label = np.flip(_label).T.astype(np.uint8)
+        target_size = tuple([nd_img.shape[0] * resize_factor,nd_img.shape[1] * resize_factor])
+        pil_i = Image.fromarray(nd_img, mode="L").convert("RGBA").resize(target_size)
+        pil_pred = Image.fromarray(nd_label, mode="P").resize(target_size)
+        pil_pred.putpalette([100, 100, 100, 255, 0, 0, 0, 255, 0])   # red for 1 and green for 2
+        pil_pred = pil_pred.convert("RGBA")
+        pil_2 = Image.blend(pil_i, pil_pred, 0.3) # blend 2 images
+        figures = [pil_i, pil_pred, pil_2]
+        for j in range(3):
+            pimg.paste(figures[j], box=(cols[j], rows[i]))
     return pimg
+
 
 def save_report_as_dcm(header, report, path):
     """Writes the supplied image as a DICOM Secondary Capture file
@@ -166,17 +186,17 @@ def save_report_as_dcm(header, report, path):
     out.SeriesInstanceUID = pydicom.uid.generate_uid()
     out.SOPInstanceUID = pydicom.uid.generate_uid()
     out.file_meta.MediaStorageSOPInstanceUID = out.SOPInstanceUID
-    out.Modality = "OT" # Other
+    out.Modality = "OT"  # Other
     out.SeriesDescription = "HippoVolume.AI"
 
     out.Rows = report.height
     out.Columns = report.width
 
-    out.ImageType = r"DERIVED\PRIMARY\AXIAL" # We are deriving this image from patient data
-    out.SamplesPerPixel = 3 # we are building an RGB image.
+    out.ImageType = r"DERIVED\PRIMARY\AXIAL"  # We are deriving this image from patient data
+    out.SamplesPerPixel = 3  # we are building an RGB image.
     out.PhotometricInterpretation = "RGB"
-    out.PlanarConfiguration = 0 # means that bytes encode pixels as R1G1B1R2G2B2... as opposed to R1R2R3...G1G2G3...
-    out.BitsAllocated = 8 # we are using 8 bits/pixel
+    out.PlanarConfiguration = 0  # means that bytes encode pixels as R1G1B1R2G2B2... as opposed to R1R2R3...G1G2G3...
+    out.BitsAllocated = 8  # we are using 8 bits/pixel
     out.BitsStored = 8
     out.HighBit = 7
     out.PixelRepresentation = 0
@@ -197,10 +217,10 @@ def save_report_as_dcm(header, report, path):
 
     # Data imprinted directly into image pixels is called "burned in annotation"
     out.BurnedInAnnotation = "YES"
-
     out.PixelData = report.tobytes()
-
-    pydicom.filewriter.dcmwrite(path, out, write_like_original=False)
+    os.makedirs(path, exist_ok=True)
+    file_name = f'{out.SeriesDescription}_{time.strftime("%Y-%m-%d_%H%M", time.localtime())}.dcm'
+    pydicom.filewriter.dcmwrite(os.path.join(path, file_name), out, write_like_original=False)
 
 def get_series_for_inference(path):
     """Reads multiple series from one folder and picks the one
@@ -228,14 +248,12 @@ def get_series_for_inference(path):
     # people who configured the HippoCrop tool and they label the output of their tool in a 
     # certain way. Can you figure out which is that? 
     # Hint: inspect the metadata of HippoCrop series
-
     # <YOUR CODE HERE>
-
+    series_for_inference = [_d for _d in dicoms if _d.SeriesDescription == 'HippoCrop']
     # Check if there are more than one series (using set comprehension).
     if len({f.SeriesInstanceUID for f in series_for_inference}) != 1:
         print("Error: can not figure out what series to run inference on")
         return []
-
     return series_for_inference
 
 def os_command(command):
@@ -271,7 +289,7 @@ if __name__ == "__main__":
     # TASK: Use the UNetInferenceAgent class and model parameter file from the previous section
     inference_agent = UNetInferenceAgent(
         device="cpu",
-        parameter_file_path=r"<PATH TO PARAMETER FILE>")
+        parameter_file_path=os.path.join(*['.', 'model', 'model.pth']))
 
     # Run inference
     # TASK: single_volume_inference_unpadded takes a volume of arbitrary size 
@@ -283,8 +301,8 @@ if __name__ == "__main__":
 
     # Create and save the report
     print("Creating and pushing report...")
-    report_save_path = r"<TEMPORARY PATH TO SAVE YOUR REPORT FILE>"
-    # TASK: create_report is not complete. Go and complete it. 
+    report_save_path = os.path.abspath(os.path.join(*['..', 'out', 'report']))
+    # TASK: create_report is not complete. Go and complete it.
     # STAND OUT SUGGESTION: save_report_as_dcm has some suggestions if you want to expand your
     # knowledge of DICOM format
     report_img = create_report(pred_volumes, header, volume, pred_label)
@@ -293,7 +311,9 @@ if __name__ == "__main__":
     # Send report to our storage archive
     # TASK: Write a command line string that will issue a DICOM C-STORE request to send our report
     # to our Orthanc server (that runs on port 4242 of the local machine), using storescu tool
-    os_command("<COMMAND LINE TO SEND REPORT TO ORTHANC>")
+    os_command(f"storescu 127.0.0.1 4242 -v -aec HIPPOAI +r +sd {report_save_path}")
+    # storescu 127.0.0.1 4242 -v -aec HIPPOAI +r +sd <path>
+    # os_command("<COMMAND LINE TO SEND REPORT TO ORTHANC>")
 
     # This line will remove the study dir if run as root user
     # Sleep to let our StoreSCP server process the report (remember - in our setup
