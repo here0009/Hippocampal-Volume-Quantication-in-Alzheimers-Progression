@@ -95,8 +95,6 @@ class UNetExperiment:
             # print(i, batch, batch['image'].shape)
             # TASK: You have your data in batch variable. Put the slices as 4D Torch Tensors of 
             # shape [BATCH_SIZE, 1, PATCH_SIZE, PATCH_SIZE] into variables data and target. 
-            # Feed data to the model and feed target to the loss function
-            # 
             data = batch['image'].to(self.device)
             target = batch['seg'].to(self.device)
             prediction = self.model(data)
@@ -109,7 +107,7 @@ class UNetExperiment:
 
             # TASK: What does each dimension of variable prediction represent?
             # ANSWER:
-            # batch_size, 1, patch_size, patch_size ?
+            # batch_size, the slice number, y pixel, z pixel
 
             loss.backward()
             self.optimizer.step()

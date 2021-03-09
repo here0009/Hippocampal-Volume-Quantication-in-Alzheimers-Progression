@@ -37,7 +37,9 @@ class UNetInferenceAgent:
         Returns:
             3D NumPy array with prediction mask
         """
-        raise NotImplementedError
+        volume = med_reshape(volume, new_shape=(volume.shape[0], self.patch_size, self.patch_size))
+        return self.single_volume_inference(volume)
+        
 
     def single_volume_inference(self, volume):
         """
