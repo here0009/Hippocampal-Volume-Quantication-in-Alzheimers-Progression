@@ -57,6 +57,7 @@ def LoadHippocampusData(root_dir, y_shape, z_shape):
         # TASK: Why do we need to cast label to int?
         # ANSWER:
         # med_reshape use np.zeros to generate a nump array of float, we need to feed label to loss function: CrossEntropyLoss, which takes int as input
+        # Absolutely..or you can also say because of the memory reasons
 
         out.append({"image": image, "seg": label, "filename": f})
 

@@ -108,6 +108,9 @@ class UNetExperiment:
             # TASK: What does each dimension of variable prediction represent?
             # ANSWER:
             # batch_size, the slice number, y pixel, z pixel
+            # Exactly !!! You can elaborate it more like:
+            # We get the probability for each class of each pixel.
+            # First dimension: batch index, second dimension: classes prob, third dimension: y pixel, fourth dimension: z pixel
 
             loss.backward()
             self.optimizer.step()
