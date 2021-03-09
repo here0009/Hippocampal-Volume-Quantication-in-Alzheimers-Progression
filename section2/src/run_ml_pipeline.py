@@ -51,7 +51,7 @@ if __name__ == "__main__":
     # TASK: create three keys in the dictionary: "train", "val" and "test". In each key, store
     # the array with indices of training volumes to be used for training, validation
     # and testing respectively.
-    # <YOUR CODE GOES HERE>
+
     train_weights = [0.8, 0.1, 0.1]
     assert sum(train_weights) == 1
     train_len, val_len, _ = [int(_r * len(data)) for _r in train_weights]

@@ -58,7 +58,6 @@ class UNetInferenceAgent:
         # that, put all slices into a 3D Numpy array. You can verify if your method is
         # correct by running it on one of the volumes in your training set and comparing
         # with the label in 3D Slicer.
-        # <YOUR CODE HERE>
         x = volume.shape[0]
         mask = np.zeros(volume.shape)
         for i in range(x):

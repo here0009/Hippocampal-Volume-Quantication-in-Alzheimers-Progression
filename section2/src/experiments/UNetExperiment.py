@@ -97,8 +97,6 @@ class UNetExperiment:
             # shape [BATCH_SIZE, 1, PATCH_SIZE, PATCH_SIZE] into variables data and target. 
             # Feed data to the model and feed target to the loss function
             # 
-            # data = <YOUR CODE HERE>
-            # target = <YOUR CODE HERE>
             data = batch['image'].to(self.device)
             target = batch['seg'].to(self.device)
             prediction = self.model(data)
@@ -154,7 +152,7 @@ class UNetExperiment:
         with torch.no_grad():
             for i, batch in enumerate(self.val_loader):
                 # TASK: Write validation code that will compute loss on a validation sample
-                # <YOUR CODE HERE>
+    
                 data = batch['image'].to(self.device)
                 target = batch['seg'].to(self.device)
                 prediction = self.model(data)

@@ -95,7 +95,6 @@ def med_reshape(image, new_shape):
 
     reshaped_image = np.zeros(new_shape)
     # TASK: write your original image into the reshaped image
-    # <CODE GOES HERE>
     ix, iy, iz = image.shape
     nx, ny, nz = new_shape
     assert ix == nx

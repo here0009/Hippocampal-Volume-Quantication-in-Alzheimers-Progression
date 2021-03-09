@@ -54,7 +54,6 @@ class SlicesDataset(Dataset):
         # and the slice number are in the slc variable.
         # Hint2: You can use None notation like so: arr[None, :] to add size-1 
         # dimension to a Numpy array
-        # <YOUR CODE GOES HERE>
         # augmentaiont to image and label
         hflip, vflip = random.random(), random.random()
         # r_angle = random.randint(*self.rotate_angle)

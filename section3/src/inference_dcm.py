@@ -61,7 +61,7 @@ def get_predicted_volumes(pred):
     """
 
     # TASK: Compute the volume of your hippocampal prediction
-    # <YOUR CODE HERE>
+
     volume_ant = np.sum(pred == 2)
     volume_post = np.sum(pred == 1)
     total_volume = volume_ant + volume_post
@@ -218,9 +218,7 @@ def save_report_as_dcm(header, report, path):
     # Data imprinted directly into image pixels is called "burned in annotation"
     out.BurnedInAnnotation = "YES"
     out.PixelData = report.tobytes()
-    os.makedirs(path, exist_ok=True)
-    file_name = f'{out.SeriesDescription}_{time.strftime("%Y-%m-%d_%H%M", time.localtime())}.dcm'
-    pydicom.filewriter.dcmwrite(os.path.join(path, file_name), out, write_like_original=False)
+    pydicom.filewriter.dcmwrite(path, out, write_like_original=False)
 
 def get_series_for_inference(path):
     """Reads multiple series from one folder and picks the one
@@ -248,7 +246,6 @@ def get_series_for_inference(path):
     # people who configured the HippoCrop tool and they label the output of their tool in a 
     # certain way. Can you figure out which is that? 
     # Hint: inspect the metadata of HippoCrop series
-    # <YOUR CODE HERE>
     series_for_inference = [_d for _d in dicoms if _d.SeriesDescription == 'HippoCrop']
     # Check if there are more than one series (using set comprehension).
     if len({f.SeriesInstanceUID for f in series_for_inference}) != 1:
@@ -273,7 +270,7 @@ if __name__ == "__main__":
 
     # Find all subdirectories within the supplied directory. We assume that 
     # one subdirectory contains a full study
-    subdirs = [os.path.join(sys.argv[1], d) for d in os.listdir(sys.argv[1]) if
+    subdirs = [os.path.abspath(os.path.join(sys.argv[1], d)) for d in os.listdir(sys.argv[1]) if
                 os.path.isdir(os.path.join(sys.argv[1], d))]
 
     # Get the latest directory
@@ -289,7 +286,7 @@ if __name__ == "__main__":
     # TASK: Use the UNetInferenceAgent class and model parameter file from the previous section
     inference_agent = UNetInferenceAgent(
         device="cpu",
-        parameter_file_path=os.path.join(*['.', 'model', 'model.pth']))
+        parameter_file_path=os.path.abspath(os.path.join(*['.', 'model', 'model.pth'])))
 
     # Run inference
     # TASK: single_volume_inference_unpadded takes a volume of arbitrary size 
@@ -301,7 +298,8 @@ if __name__ == "__main__":
 
     # Create and save the report
     print("Creating and pushing report...")
-    report_save_path = os.path.abspath(os.path.join(*['..', 'out', 'report']))
+    file_name = f'report_{time.strftime("%Y-%m-%d_%H%M", time.localtime())}.dcm'
+    report_save_path = os.path.abspath(os.path.join(*['..', 'out', file_name]))
     # TASK: create_report is not complete. Go and complete it.
     # STAND OUT SUGGESTION: save_report_as_dcm has some suggestions if you want to expand your
     # knowledge of DICOM format
