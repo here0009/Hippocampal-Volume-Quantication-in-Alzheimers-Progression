@@ -1,0 +1,147 @@
+{
+  "volume_stats": [
+    {
+      "filename": "hippocampus_317.nii.gz",
+      "dice": 0.8665883044372612,
+      "jaccard": 0.7645838734767955
+    },
+    {
+      "filename": "hippocampus_058.nii.gz",
+      "dice": 0.9200810095030378,
+      "jaccard": 0.8519907674552799
+    },
+    {
+      "filename": "hippocampus_034.nii.gz",
+      "dice": 0.9278923504461021,
+      "jaccard": 0.8654843110504775
+    },
+    {
+      "filename": "hippocampus_174.nii.gz",
+      "dice": 0.9118110236220472,
+      "jaccard": 0.8379160636758322
+    },
+    {
+      "filename": "hippocampus_233.nii.gz",
+      "dice": 0.8977480219111381,
+      "jaccard": 0.8144671452236334
+    },
+    {
+      "filename": "hippocampus_361.nii.gz",
+      "dice": 0.876425855513308,
+      "jaccard": 0.7800338409475466
+    },
+    {
+      "filename": "hippocampus_156.nii.gz",
+      "dice": 0.9070111694253802,
+      "jaccard": 0.8298448657966018
+    },
+    {
+      "filename": "hippocampus_006.nii.gz",
+      "dice": 0.9203326503555502,
+      "jaccard": 0.8524224157177942
+    },
+    {
+      "filename": "hippocampus_001.nii.gz",
+      "dice": 0.9145627821434543,
+      "jaccard": 0.8425754775107825
+    },
+    {
+      "filename": "hippocampus_314.nii.gz",
+      "dice": 0.8470286721127663,
+      "jaccard": 0.7346485134759655
+    },
+    {
+      "filename": "hippocampus_098.nii.gz",
+      "dice": 0.9262149698474637,
+      "jaccard": 0.8625702015196565
+    },
+    {
+      "filename": "hippocampus_219.nii.gz",
+      "dice": 0.8823729969314695,
+      "jaccard": 0.7895057962172056
+    },
+    {
+      "filename": "hippocampus_207.nii.gz",
+      "dice": 0.9130328270455659,
+      "jaccard": 0.839981969799414
+    },
+    {
+      "filename": "hippocampus_077.nii.gz",
+      "dice": 0.9035063113604488,
+      "jaccard": 0.8239959068815554
+    },
+    {
+      "filename": "hippocampus_212.nii.gz",
+      "dice": 0.9119675456389452,
+      "jaccard": 0.8381804623415362
+    },
+    {
+      "filename": "hippocampus_374.nii.gz",
+      "dice": 0.9188303503907235,
+      "jaccard": 0.8498484495220331
+    },
+    {
+      "filename": "hippocampus_320.nii.gz",
+      "dice": 0.9046474358974359,
+      "jaccard": 0.8258961228968544
+    },
+    {
+      "filename": "hippocampus_193.nii.gz",
+      "dice": 0.9140807174887893,
+      "jaccard": 0.8417575156921044
+    },
+    {
+      "filename": "hippocampus_316.nii.gz",
+      "dice": 0.8753817071397412,
+      "jaccard": 0.778381174036721
+    },
+    {
+      "filename": "hippocampus_093.nii.gz",
+      "dice": 0.9152034844154077,
+      "jaccard": 0.84366373902133
+    },
+    {
+      "filename": "hippocampus_331.nii.gz",
+      "dice": 0.8878462237021341,
+      "jaccard": 0.7983124659771367
+    },
+    {
+      "filename": "hippocampus_373.nii.gz",
+      "dice": 0.9208556149732621,
+      "jaccard": 0.8533201189296333
+    },
+    {
+      "filename": "hippocampus_228.nii.gz",
+      "dice": 0.8645462023581025,
+      "jaccard": 0.7614102873702004
+    },
+    {
+      "filename": "hippocampus_393.nii.gz",
+      "dice": 0.8988733905579399,
+      "jaccard": 0.8163215590742996
+    },
+    {
+      "filename": "hippocampus_330.nii.gz",
+      "dice": 0.797684887459807,
+      "jaccard": 0.6634574240479247
+    },
+    {
+      "filename": "hippocampus_143.nii.gz",
+      "dice": 0.8915763135946623,
+      "jaccard": 0.8043641835966893
+    }
+  ],
+  "overall": {
+    "mean_dice": 0.8967731853181515,
+    "mean_jaccard": 0.8140359481251923
+  },
+  "config": {
+    "name": "Basic_unet",
+    "root_dir": "G:\\MOOC\\Udacity\\NanoDegree AI for healthcare\\Applying AI to 3D Medical Imaging Data\\Hippocampal Volume Quanti cation in Alzheimers Progression\\section1\\out",
+    "n_epochs": 10,
+    "learning_rate": 5e-05,
+    "batch_size": 8,
+    "patch_size": 64,
+    "test_results_dir": "G:\\MOOC\\Udacity\\NanoDegree AI for healthcare\\Applying AI to 3D Medical Imaging Data\\Hippocampal Volume Quanti cation in Alzheimers Progression\\section2\\out"
+  }
+}

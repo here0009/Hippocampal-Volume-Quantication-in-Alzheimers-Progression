@@ -1,6 +1,4 @@
-data
 *.pyc
-section2/out
 section2/src/runs
-*.dcm
 section3/src/model/
+data/
